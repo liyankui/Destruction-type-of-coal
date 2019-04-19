@@ -1,0 +1,29 @@
+;;;;Matelab;
+clear all;
+clc;
+load dataset.mat            
+load labelset.mat        
+train_set = [dataset(1:5,:);dataset(11:15,:)];
+train_set_labels = [lableset(1:5);lableset(11:15)];
+test_set = [dataset(6:10,:);dataset(16:20,:)];
+test_set_labels = [lableset(6:10);lableset(16:20)];
+[mtrain,ntrain] = size(train_set);
+[mtest,ntest] = size(test_set);
+test_dataset = [train_set;test_set];
+[dataset_scale,ps] = mapminmax(test_dataset',0,1);
+dataset_scale = dataset_scale';
+ 
+train_set = dataset_scale(1:mtrain,:);
+test_set = dataset_scale( (mtrain+1):(mtrain+mtest),: );
+ 
+model = svmtrain(train_set_labels, train_set, '-s 2 -c 1 -g 0.07');
+ 
+[predict_label] = svmpredict(test_set_labels, test_set, model);
+ 
+
+figure;
+hold on;
+plot(test_set_labels,'o');
+plot(predict_label,'r*');
+
+grid on;
